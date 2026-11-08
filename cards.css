@@ -1,0 +1,89 @@
+/* =========================================================
+   BLUE DEMON CARDS — styles (loaded after styles.css)
+   ========================================================= */
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; font-display: swap; src: url("fonts/barlow-condensed-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url("fonts/barlow-condensed-latin-800-normal.woff2") format("woff2"); }
+
+/* A sixth tab on phones */
+@media (max-width: 760px) {
+  .tabs { grid-template-columns: repeat(6, 1fr); }
+  .tab { font-size: .64rem; }
+}
+
+.card-lab { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 860px) { .card-lab { grid-template-columns: minmax(0, 1fr) 340px; } }
+
+/* Stage: the card sits under a soft pool of light */
+.card-stage {
+  display: grid; place-items: center; min-height: 440px; padding: 28px 16px;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: radial-gradient(60% 55% at 50% 42%, var(--accent-soft), transparent 70%), var(--surface);
+  touch-action: pan-y;
+  --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
+}
+.card-controls { display: grid; gap: 14px; align-content: start; }
+.card-controls select, .card-field input {
+  width: 100%; height: 42px; padding: 0 12px;
+  border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2);
+}
+.card-controls select:focus-visible, .card-field input:focus-visible { outline-offset: 0; }
+.card-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card-field { display: grid; gap: 4px; font-size: .78rem; font-weight: 700; color: var(--muted); }
+.card-field.is-wide { grid-column: 1 / -1; }
+.card-how { font-size: .85rem; color: var(--muted); }
+.card-how summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+.card-how p { margin-top: 8px; }
+
+/* ---------- The card ---------- */
+.fcard-wrap { width: min(300px, 100%); container-type: inline-size; perspective: 900px; filter: drop-shadow(0 22px 22px rgba(3, 12, 28, .35)); }
+.fcard {
+  --u: calc(100cqw / 300);
+  position: relative; aspect-ratio: 300 / 440; overflow: hidden; color: var(--ink);
+  font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  clip-path: polygon(0 4.5%, 15% 0, 85% 0, 100% 4.5%, 100% 95.5%, 85% 100%, 15% 100%, 0 95.5%);
+  background:
+    radial-gradient(120% 65% at 50% 0%, var(--c3), transparent 62%),
+    repeating-linear-gradient(115deg, transparent 0 calc(var(--u) * 16), rgba(255, 255, 255, .06) calc(var(--u) * 16) calc(var(--u) * 17)),
+    linear-gradient(165deg, var(--c2), var(--c1));
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform .6s cubic-bezier(.2, .8, .2, 1);
+}
+.is-tilting .fcard { transition: transform .08s linear; }
+.fcard[data-tier="bronze"] { --c1: #6f4a2f; --c2: #c78f5c; --c3: #f0c9a0; --ink: #2b1608; --line: rgba(43, 22, 8, .28); }
+.fcard[data-tier="silver"] { --c1: #8693a6; --c2: #d3dbe6; --c3: #f7fafd; --ink: #152033; --line: rgba(21, 32, 51, .25); }
+.fcard[data-tier="gold"]   { --c1: #9d6f17; --c2: #e4bd57; --c3: #fcecb0; --ink: #2a1c02; --line: rgba(42, 28, 2, .28); }
+.fcard[data-tier="demon"]  { --c1: #031735; --c2: #1a4cab; --c3: #8fc6ff; --ink: #eef6ff; --line: rgba(238, 246, 255, .3); }
+
+.fcard::after { /* light that slides across as you tilt */
+  content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, .9), transparent 55%);
+}
+.is-tilting .fcard::after { opacity: .75; }
+
+.fcard-mark { position: absolute; left: 9%; top: 47%; width: 82%; opacity: .07; filter: grayscale(1) contrast(1.2); }
+.fcard-ovr { position: absolute; left: calc(var(--u) * 34); top: calc(var(--u) * 46); display: grid; justify-items: center; line-height: .86; }
+.fcard-ovr b { font-size: calc(var(--u) * 78); font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.fcard-ovr span { margin-top: calc(var(--u) * 6); padding-top: calc(var(--u) * 5); border-top: 2px solid var(--line); min-width: calc(var(--u) * 46); text-align: center; font-size: calc(var(--u) * 24); font-weight: 600; letter-spacing: .08em; }
+
+.fcard-photo { position: absolute; left: 30%; right: 0; top: calc(var(--u) * 22); height: calc(var(--u) * 180); }
+.fcard-avatar { position: relative; display: grid; place-items: center; width: 100%; height: 100%; }
+.fcard-avatar > span { font-size: calc(var(--u) * 120); font-weight: 800; opacity: .22; }
+.fcard-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+
+.fcard-name { position: absolute; left: 6%; right: 6%; top: calc(var(--u) * 212); text-align: center; font-size: calc(var(--u) * 38); font-weight: 800; line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: calc(var(--u) * 8); border-bottom: 2px solid var(--line); }
+.fcard-attrs { position: absolute; left: 12%; right: 12%; top: calc(var(--u) * 270); display: grid; grid-template-columns: 1fr 1fr; gap: 0 calc(var(--u) * 26); }
+.fcard-attrs ul { list-style: none; margin: 0; padding: 0 0 0 0; display: grid; gap: calc(var(--u) * 2); }
+.fcard-attrs ul + ul { border-left: 2px solid var(--line); padding-left: calc(var(--u) * 24); }
+.fcard-attrs li { display: flex; align-items: baseline; justify-content: center; gap: calc(var(--u) * 10); }
+.fcard-attrs b { min-width: 2ch; text-align: right; font-size: calc(var(--u) * 30); font-weight: 800; font-variant-numeric: tabular-nums; }
+.fcard-attrs span { min-width: 3ch; font-size: calc(var(--u) * 22); font-weight: 600; letter-spacing: .04em; opacity: .85; }
+.fcard-foot { position: absolute; left: 0; right: 0; bottom: calc(var(--u) * 20); text-align: center; font-size: calc(var(--u) * 16); font-weight: 600; letter-spacing: .1em; opacity: .7; }
+
+/* The one choreographed moment: the card is dealt in when you pick a player */
+.fcard.is-dealt { animation: card-deal .8s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes card-deal {
+  from { opacity: 0; transform: translateY(40px) rotateY(-75deg) scale(.9); }
+  60% { opacity: 1; }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .fcard, .fcard::after { transition: none; } .fcard.is-dealt { animation: none; } }

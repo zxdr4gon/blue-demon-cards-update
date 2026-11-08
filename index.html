@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a2b66" />
+  <meta name="description" content="Live batting, bowling and match stats for the Maine East Blue Demon cricket team." />
+  <title>Blue Demon Cricket | Maine East</title>
+
+  <!-- Installable web app -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="icons/favicon-64.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Blue Demons" />
+
+  <!-- Apply saved theme before first paint (no flash) -->
+  <script>
+    try {
+      const t = localStorage.getItem("blueDemonTheme");
+      const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+    } catch { document.documentElement.dataset.theme = "light"; }
+  </script>
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="cards.css" />
+  <script defer src="app.js"></script>
+  <script defer src="cards.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#home" aria-label="Blue Demon Cricket home">
+        <img class="brand-logo" src="icons/logo-160.png" alt="" width="40" height="40" />
+        <span class="brand-text">
+          <strong>Blue Demons</strong>
+          <small>Maine East Cricket</small>
+        </span>
+      </a>
+
+      <nav class="tabs" aria-label="Sections">
+        <a class="tab" href="#home" data-view="home">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+          <span>Home</span>
+        </a>
+        <a class="tab" href="#batting" data-view="batting">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19.5 3.5 1 1-9.6 9.6 1.6 1.6-3.6 3.6a2 2 0 0 1-2.8 0l-.4-.4a2 2 0 0 1 0-2.8l3.6-3.6 1.6 1.6z"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+          <span>Batting</span>
+        </a>
+        <a class="tab" href="#bowling" data-view="bowling">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M8.5 5.5c2 3.8 2 9.2 0 13M15.5 5.5c-2 3.8-2 9.2 0 13" fill="none" stroke="var(--tab-cut)" stroke-width="1.4" stroke-dasharray="1.6 1.6"/></svg>
+          <span>Bowling</span>
+        </a>
+        <a class="tab" href="#matches" data-view="matches">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18" stroke="var(--tab-cut)" stroke-width="1.6"/></svg>
+          <span>Matches</span>
+        </a>
+        <a class="tab" href="#vs" data-view="vs">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h5l3 8-3 8H4l3-8zM20 4h-5l-3 8 3 8h5l-3-8z"/></svg>
+          <span>VS</span>
+        </a>
+        <a class="tab" href="#cards" data-view="cards">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><circle cx="12" cy="9" r="2.2" fill="var(--tab-cut)"/><path d="M9 14.5h6M9.8 17.5h4.4" stroke="var(--tab-cut)" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span>Cards</span>
+        </a>
+      </nav>
+
+      <div class="topbar-actions">
+        <label class="season">
+          <span class="sr-only">Season</span>
+          <select id="seasonSelect"></select>
+        </label>
+        <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+          <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div id="ptr" class="ptr" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- HOME -->
+    <section class="view" id="view-home" data-view="home">
+      <div class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span id="heroSeason">Season</span> · Live</p>
+          <h1>Blue Demon Cricket</h1>
+          <div class="record" id="heroRecord" aria-live="polite"></div>
+          <div class="sync">
+            <span id="syncDot" class="sync-dot"></span>
+            <span id="syncStatus">Loading stats…</span>
+            <button id="refreshBtn" class="refresh" type="button" aria-label="Refresh data">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <img class="hero-logo" src="icons/logo-160.png" alt="" width="160" height="160" />
+      </div>
+
+      <div class="stat-grid" id="summaryCards"></div>
+
+      <div class="panel-grid">
+        <article class="panel">
+          <header class="panel-head">
+            <div><p class="eyebrow">Batting</p><h2>Top run scorers</h2></div>
+            <a class="link" href="#batting">All →</a>
+          </header>
+          <ol class="leader-list" id="runsLeaders"></ol>
+        </article>
+        <article class="panel">
+          <header class="panel-head">
+            <div><p class="eyebrow">Bowling</p><h2>Top wicket takers</h2></div>
+            <a class="link" href="#bowling">All →</a>
+          </header>
+          <ol class="leader-list is-red" id="wicketsLeaders"></ol>
+        </article>
+      </div>
+
+      <article class="panel">
+        <header class="panel-head">
+          <div><p class="eyebrow">Results</p><h2>Recent matches</h2></div>
+          <a class="link" href="#matches">All →</a>
+        </header>
+        <div class="match-list" id="recentMatches"></div>
+      </article>
+
+      <article class="panel">
+        <header class="panel-head">
+          <div><p class="eyebrow">Season bests</p><h2>Records</h2></div>
+        </header>
+        <div class="records-grid" id="recordsGrid"></div>
+        <div id="milestones" hidden>
+          <h3 class="sub-head">Chasing milestones</h3>
+          <ul class="milestone-list" id="milestoneList"></ul>
+        </div>
+      </article>
+    </section>
+
+    <!-- BATTING -->
+    <section class="view" id="view-batting" data-view="batting" hidden>
+      <header class="view-head">
+        <div><p class="eyebrow">Leaderboard</p><h2>Batting</h2></div>
+        <input id="battingSearch" class="search" type="search" placeholder="Search players" aria-label="Search batting players" autocomplete="off" />
+      </header>
+      <div class="table-card">
+        <div class="table-scroll"><table id="battingTable" class="stats-table"><thead></thead><tbody></tbody></table></div>
+        <p id="battingEmpty" class="empty" hidden>No players match your search.</p>
+      </div>
+      <p class="hint">Tap a column to sort · tap a player for their profile</p>
+    </section>
+
+    <!-- BOWLING -->
+    <section class="view" id="view-bowling" data-view="bowling" hidden>
+      <header class="view-head">
+        <div><p class="eyebrow">Leaderboard</p><h2>Bowling</h2></div>
+        <input id="bowlingSearch" class="search" type="search" placeholder="Search players" aria-label="Search bowling players" autocomplete="off" />
+      </header>
+      <div class="table-card">
+        <div class="table-scroll"><table id="bowlingTable" class="stats-table"><thead></thead><tbody></tbody></table></div>
+        <p id="bowlingEmpty" class="empty" hidden>No players match your search.</p>
+      </div>
+      <p class="hint">Tap a column to sort · tap a player for their profile</p>
+    </section>
+
+    <!-- MATCHES -->
+    <section class="view" id="view-matches" data-view="matches" hidden>
+      <header class="view-head">
+        <div><p class="eyebrow">Fixtures &amp; results</p><h2>Matches</h2></div>
+        <div class="chips" id="matchFilter" role="group" aria-label="Filter matches">
+          <button class="chip is-active" data-filter="all" type="button">All</button>
+          <button class="chip" data-filter="win" type="button">Won</button>
+          <button class="chip" data-filter="loss" type="button">Lost</button>
+        </div>
+      </header>
+      <div class="match-list" id="matchesList"></div>
+      <p id="matchesEmpty" class="empty" hidden>No matches yet.</p>
+    </section>
+
+    <!-- VS -->
+    <section class="view" id="view-vs" data-view="vs" hidden>
+      <header class="view-head">
+        <div><p class="eyebrow">Head to head</p><h2>VS Mode</h2></div>
+        <button id="vsShare" class="share-btn is-pill" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Share
+        </button>
+      </header>
+      <div class="panel">
+        <div class="vs-pickers">
+          <label><span class="sr-only">Player A</span><select id="vsPlayerA"></select></label>
+          <span class="vs-badge">VS</span>
+          <label><span class="sr-only">Player B</span><select id="vsPlayerB"></select></label>
+        </div>
+        <div id="vsComparison" class="vs-rows"></div>
+      </div>
+    </section>
+
+    <!-- CARDS -->
+    <section class="view" id="view-cards" data-view="cards" hidden>
+      <header class="view-head">
+        <div><p class="eyebrow">Player cards</p><h2>Cards</h2></div>
+        <button id="cardShare" class="share-btn is-pill" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Share
+        </button>
+      </header>
+      <div class="card-lab">
+        <div class="card-stage" id="cardStage"></div>
+        <div class="panel card-controls">
+          <div class="chips" id="cardMode" role="group" aria-label="Card source">
+            <button class="chip is-active" data-mode="roster" type="button">Roster</button>
+            <button class="chip" data-mode="custom" type="button">Enter stats</button>
+          </div>
+          <label id="cardRoster"><span class="sr-only">Player</span><select id="cardPlayer"></select></label>
+          <div id="cardCustom" hidden>
+            <div class="card-fields">
+              <label class="card-field is-wide"><span>Name</span><input id="cardName" type="text" maxlength="24" autocomplete="off" placeholder="Player name"></label>
+              <label class="card-field is-wide"><span>Role</span>
+                <select id="cardRole"><option value="auto">Auto</option><option value="BAT">Batter</option><option value="BWL">Bowler</option><option value="ALL">All-rounder</option><option value="WK">Wicketkeeper</option></select>
+              </label>
+            </div>
+            <div class="card-fields" id="cardFields" style="margin-top:10px"></div>
+          </div>
+          <details class="card-how">
+            <summary>How ratings work</summary>
+            <p>BAT blends average and runs, PWR is boundary rate, SR is strike rate. BWL blends wickets and bowling average, ECO is economy, FLD is catches. Small samples are pulled down so one big innings can't make a 99. Overall follows the role: Bronze under 60, Silver 60+, Gold 75+, Demon 85+.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install option, kept low-key at the bottom of every page -->
+    <footer class="app-foot" id="installWrap" hidden>
+      <button id="installBtn" class="foot-link" type="button">Install app</button>
+      <p id="installHint" class="hint" hidden></p>
+    </footer>
+  </main>
+
+  <dialog id="playerModal" class="sheet" aria-labelledby="playerName">
+    <div class="sheet-inner">
+      <button class="sheet-close" type="button" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+      <div id="playerModalBody"></div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
